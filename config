@@ -1,3 +1,4 @@
 pin = 26
 secondiAttesa = 3
-fileLogPlot = test.json
+fileLogPlot = dati.json
+plot = True

@@ -16,7 +16,7 @@ if len(sys.argv) != 2:
     
 pathFile = sys.argv[1]
 
-def live_plotter_xy(x_vec,y1_data,line1,identifier='',pause_time=0.01, yLabel='y', xLabel='x', epsilon=10):
+def live_plotter_xy(x_vec,y1_data,line1,identifier='',pause_time=0.01, yLabel='y', xLabel='x'):
     if line1==[]:
         plt.ion()
         fig = plt.figure(figsize=(20,10))
@@ -28,7 +28,7 @@ def live_plotter_xy(x_vec,y1_data,line1,identifier='',pause_time=0.01, yLabel='y
         plt.show()
         
     line1.set_data(x_vec,y1_data)
-    plt.xlim(np.min(x_vec) - epsilon, np.max(x_vec) + epsilon)
+    plt.xlim(np.min(x_vec)-3, np.max(x_vec)+3)	
     if np.min(y1_data)<=line1.axes.get_ylim()[0] or np.max(y1_data)>=line1.axes.get_ylim()[1]:
         plt.ylim([np.min(y1_data)-np.std(y1_data),np.max(y1_data)+np.std(y1_data)])
 
@@ -56,7 +56,7 @@ def controlla():
 	while (humidity is None and temperature is None) or humidity > 100:
 		humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
 	t = 'Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity)
-	print(t)
+	#print(t)
 	salvaLogPlot(temperature, humidity)
 	
 	time.sleep(int(configurazione["secondiAttesa"]))
@@ -68,15 +68,16 @@ def salvaLogPlot(temperatura, umidita):
 	nomeFile = configurazione["fileLogPlot"]
 	
 	misure = getMisureFromFile()
-	
+		
 	misure['h'].append(float(umidita))
 	misure['t'].append(float(temperatura))
 	
 	with open(nomeFile, "w+") as outfile:
 		json.dump(misure, outfile)
 	
-	global line1
-	line1 = live_plotter_xy(range(0, len(misure['h'])), misure['h'], line1, identifier='Umidità', xLabel='Numero di misurazioni', yLabel='Valori registrati', epsilon=3)
+	if configurazione["plot"] == True:
+		global line1
+		line1 = live_plotter_xy(range(0, len(misure['h'])), misure['h'], line1, identifier='Umidità', xLabel='Numero misurazione', yLabel='Valori registrati')
 	
 
 def getMisureFromFile():
